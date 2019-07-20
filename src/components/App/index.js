@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Navigation from "../Navigation";
@@ -10,22 +10,35 @@ import HomePage from "../Home";
 import AccountPage from "../Account";
 import AdminPage from "../Admin";
 
+import { FirebaseContext } from "../Firebase";
+import { AuthUserContext } from "../Session";
 import * as ROUTES from "../../constants/routes";
 
-const App = () => (
-  <Router>
-    <Navigation />
+const App = () => {
+  const [user, setUser] = useState(null);
+  const firebase = useContext(FirebaseContext);
 
-    <hr />
+  useEffect(() => {
+    firebase.auth.onAuthStateChanged(authUser => setUser(authUser));
+  });
 
-    <Route exact path={ROUTES.LANDING} component={LandingPage} />
-    <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
-    <Route path={ROUTES.SIGN_IN} component={SignInPage} />
-    <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
-    <Route path={ROUTES.HOME} component={HomePage} />
-    <Route path={ROUTES.ACCOUNT} component={AccountPage} />
-    <Route path={ROUTES.ADMIN} component={AdminPage} />
-  </Router>
-);
+  return (
+    <AuthUserContext.Provider value={user}>
+      <Router>
+        <Navigation />
+
+        <hr />
+
+        <Route exact path={ROUTES.LANDING} component={LandingPage} />
+        <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+        <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+        <Route path={ROUTES.PASSWORD_FORGET} component={PasswordForgetPage} />
+        <Route path={ROUTES.HOME} component={HomePage} />
+        <Route path={ROUTES.ACCOUNT} component={AccountPage} />
+        <Route path={ROUTES.ADMIN} component={AdminPage} />
+      </Router>
+    </AuthUserContext.Provider>
+  );
+};
 
 export default App;
